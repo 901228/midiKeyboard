@@ -10,6 +10,8 @@ int octave = 0; // add or subtract 8 for one octave
 bool currentState[matrix1 * matrix2];
 bool requestState[matrix1 * matrix2];
 
+byte noteMap(int num);
+
 
 #define NOTE_ON_CMD 0x90
 #define NOTE_OFF_CMD 0x80
@@ -24,7 +26,7 @@ void setup() {
 
   for (int i = 0; i < matrix2; i++) pinMode(matrix2pin[i], INPUT);
 
-  Serial.begin(31250);
+  Serial.begin(115200);
 }
 
 void loop() {
@@ -54,7 +56,8 @@ void writeKeys() {
 
     if(requestState[i] == true && currentState[i] == false) {
 
-      noteOn(60);
+      noteOn(noteMap(i));
+      //Serial.println(noteMap(i));
 
       //noteOn(0, 36 + octave + (i * matrix2) % matrix1 * matrix2 + i / matrix1, 64);
       currentState[i] = true;
@@ -62,7 +65,7 @@ void writeKeys() {
 
     if(requestState[i] == false && currentState[i] == true) {
 
-      noteOff(60);
+      noteOff(noteMap(i));
 
       //noteOff(0, 36 + octave + (i * matrix2) % matrix1 * matrix2 + i / matrix1, 64);
       currentState[i] = false;
@@ -84,4 +87,69 @@ void noteOff(int pitch) {
   Serial.write(pitch);
   Serial.write(NOTE_VELOCITY);
   //MIDI.sendNoteOff(pitch, 0, 1);
+}
+
+byte noteMap(int num) {
+
+  switch(num) {
+
+    case 28:
+      return 56;
+    case 24:
+      return 57;
+    case 20:
+      return 58;
+    case 16:
+      return 59;
+    case 12:
+      return 60;
+    case 8:
+      return 61;
+    case 4:
+      return 62;
+    case 0:
+      return 63;
+    case 29:
+      return 64;
+    case 25:
+      return 65;
+    case 21:
+      return 66;
+    case 17:
+      return 67;
+    case 13:
+      return 68;
+    case 9:
+      return 69;
+    case 5:
+      return 70;
+    case 1:
+      return 71;
+    case 30:
+      return 72;
+    case 26:
+      return 73;
+    case 22:
+      return 74;
+    case 18:
+      return 75;
+    case 14:
+      return 76;
+    case 10:
+      return 77;
+    case 6:
+      return 78;
+    case 2:
+      return 79;
+    case 31:
+      return 80;
+    case 27:
+      return 81;
+    case 23:
+      return 82;
+    case 19:
+      return 83;
+    case 15:
+      return 84;
+  }
 }
