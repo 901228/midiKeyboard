@@ -1,3 +1,6 @@
+//#include <MIDI.h>
+//MIDI_CREATE_DEFAULT_INSTANCE();
+
 const int matrix1 = 4;
 const int matrix2 = 8;
 const int matrix1pin[matrix1] = {2, 3, 4, 5};
@@ -15,6 +18,8 @@ bool requestState[matrix1 * matrix2];
 
 void setup() {
 
+  //MIDI.begin();
+
   for (int i = 0; i < matrix1; i++) pinMode(matrix1pin[i], INPUT);
 
   for (int i = 0; i < matrix2; i++) pinMode(matrix2pin[i], INPUT);
@@ -26,7 +31,7 @@ void loop() {
 
   readKeys();
   writeKeys();
-  delay(1);
+  delay(25);
 }
 
 void readKeys() {
@@ -43,40 +48,40 @@ void readKeys() {
   }
 }
 
-int count = 0;
 void writeKeys() {
 
   for(int i = 0; i < matrix1 * matrix2; i++) {
 
     if(requestState[i] == true && currentState[i] == false) {
 
-      Serial.write(NOTE_ON_CMD);
-      Serial.write(36 + octave + (i * matrix2) % matrix1 * matrix2 + i / matrix1);
-      Serial.write(NOTE_VELOCITY);
+      noteOn(60);
 
       //noteOn(0, 36 + octave + (i * matrix2) % matrix1 * matrix2 + i / matrix1, 64);
-      currentState[i] = requestState[i];
+      currentState[i] = true;
     }
 
     if(requestState[i] == false && currentState[i] == true) {
 
-      Serial.write(NOTE_OFF_CMD);
-      Serial.write(36 + octave + (i * matrix2) % matrix1 * matrix2 + i / matrix1);
-      Serial.write(NOTE_VELOCITY);
+      noteOff(60);
 
       //noteOff(0, 36 + octave + (i * matrix2) % matrix1 * matrix2 + i / matrix1, 64);
-      currentState[i] = requestState[i];
+      currentState[i] = false;
     }
   }
 }
 
+void noteOn(int pitch) {
 
-void noteOn(byte channel, byte pitch, byte velocity) {
-
-  //midiEventPacket_t noteOn = {0x09, 0x90 | channel, pitch, velocity};
+  Serial.write(NOTE_ON_CMD);
+  Serial.write(pitch);
+  Serial.write(NOTE_VELOCITY);
+  //MIDI.sendNoteOn(pitch, 127, 1);
 }
 
-void noteOff(byte channel, byte pitch, byte velocity) {
+void noteOff(int pitch) {
 
-  //midiEventPacket_t noteOff = {0x08, 0x80 | channel, pitch, velocity};
+  Serial.write(NOTE_OFF_CMD);
+  Serial.write(pitch);
+  Serial.write(NOTE_VELOCITY);
+  //MIDI.sendNoteOff(pitch, 0, 1);
 }
